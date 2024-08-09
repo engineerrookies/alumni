@@ -14,7 +14,7 @@ export default function Navbar() {
             alt="SDD Alumni Logo"
             width={35} // Adjust width as needed
             height={35} // Adjust height as needed
-            className="mr-2" // Optional: margin-right to add space between logo and text
+            className="mr-1" // Optional: margin-right to add space between logo and text
           />
           Alumni!
         </Link>
