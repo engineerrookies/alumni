@@ -9,14 +9,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-10 bg-card shadow-sm">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-4 px-5 py-3">
         <Link href="/" className="flex items-center text-x1 font-bold text-primary">
-          <Image
-            src={logoImage} // Path to your logo image in the public directory
-            alt="SDD Alumni Logo"
-            width={35} // Adjust width as needed
-            height={35} // Adjust height as needed
-            className="mr-1" // Optional: margin-right to add space between logo and text
-          />
-          Alumni!
+          SDD Alumni!
         </Link>
         <SearchField />
         <UserButton className="sm:ms-auto" />
