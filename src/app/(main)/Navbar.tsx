@@ -16,7 +16,7 @@ export default function Navbar() {
             height={35} // Adjust height as needed
             className="mr-2" // Optional: margin-right to add space between logo and text
           />
-          SDD Alumni
+          Alumni!
         </Link>
         <SearchField />
         <UserButton className="sm:ms-auto" />
