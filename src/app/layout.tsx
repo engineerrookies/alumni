@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: "%s | SDD Alumni",
     default: "SDD Alumni",
   },
-  description: "The social media app for powernerds",
+  description: "A place for SDD Alumni",
 };
 
 export default function RootLayout({
