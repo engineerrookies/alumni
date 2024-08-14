@@ -43,7 +43,7 @@ export default function PostEditor() {
         italic: false,
       }),
       Placeholder.configure({
-        placeholder: "Post an update!",
+        placeholder: "What's on your mind?",
       }),
     ],
   });
