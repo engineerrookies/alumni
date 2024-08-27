@@ -6,6 +6,8 @@ import { Bookmark, Home } from "lucide-react";
 import Link from "next/link";
 import MessagesButton from "./MessagesButton";
 import NotificationsButton from "./NotificationsButton";
+import { BsCake2 } from "react-icons/bs";
+import { IoHomeOutline } from "react-icons/io5";
 
 interface MenuBarProps {
   className?: string;
@@ -35,7 +37,7 @@ export default async function MenuBar({ className }: MenuBarProps) {
         asChild
       >
         <Link href="/">
-          <Home />
+          <IoHomeOutline size={24} />
           <span className="hidden lg:inline">Home</span>
         </Link>
       </Button>
@@ -52,6 +54,17 @@ export default async function MenuBar({ className }: MenuBarProps) {
         <Link href="/bookmarks">
           <Bookmark />
           <span className="hidden lg:inline">Bookmarks</span>
+        </Link>
+      </Button>
+      <Button
+        variant="ghost"
+        className="flex items-center justify-start gap-3"
+        title="Sobriety Date"
+        asChild
+      >
+        <Link href="/sobers">
+          <BsCake2 size={24} />
+          <span className="hidden lg:inline">Sobriety</span>
         </Link>
       </Button>
     </div>

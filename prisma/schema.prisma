@@ -24,6 +24,7 @@ model User {
   googleId              String?        @unique
   avatarUrl             String?
   bio                   String?
+  sober                 DateTime?
   sessions              Session[]
   posts                 Post[]
   following             Follow[]       @relation("Following")
@@ -148,3 +149,5 @@ enum NotificationType {
   FOLLOW
   COMMENT
 }
+
+
