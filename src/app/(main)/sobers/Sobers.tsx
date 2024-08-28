@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import Modal from './Modal';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Sobers: React.FC = () => {
-  const [offeredDate, setOfferedDate] = useState<string | null>(null);
+  const [offeredDate, setOfferedDate] = useState<Date | null>(null);
   const [timeDiff, setTimeDiff] = useState<{
     years: number;
     months: number;
@@ -13,7 +15,6 @@ const Sobers: React.FC = () => {
     hours: number;
   } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newDate, setNewDate] = useState<string>('');
   const [notification, setNotification] = useState<string | null>(null);
 
   useEffect(() => {
@@ -21,7 +22,7 @@ const Sobers: React.FC = () => {
       try {
         const response = await axios.get('/api/soberData');
         if (response.status === 200 && response.data.soberDate) {
-          setOfferedDate(response.data.soberDate);
+          setOfferedDate(new Date(response.data.soberDate));
         }
       } catch (error) {
         console.error('Error fetching sober date:', error);
@@ -37,14 +38,7 @@ const Sobers: React.FC = () => {
     const calculateDateDifference = () => {
       try {
         const currentDate = new Date();
-        const offered = new Date(offeredDate);
-
-        if (isNaN(offered.getTime())) {
-          console.error('Invalid date format:', offeredDate);
-          return;
-        }
-
-        const diffInMilliseconds = currentDate.getTime() - offered.getTime();
+        const diffInMilliseconds = currentDate.getTime() - offeredDate.getTime();
         const diffInHours = Math.floor(diffInMilliseconds / (1000 * 60 * 60)) - 7;
         const diffInDays = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24)) + 1;
 
@@ -101,50 +95,17 @@ const Sobers: React.FC = () => {
     }
   };
 
-  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedDate = event.target.value;
-    setNewDate(selectedDate);
+  const handleDateChange = (date: Date | null) => {
+    setOfferedDate(date);
   };
 
   const handleSaveDate = async () => {
-    const currentDate = new Date();
-    const selectedDate = new Date(newDate);
-
-    if (selectedDate > currentDate) {
-      toast.error('To properly calculate sobriety date, please enter an earlier date.', {
-        position: "top-center",
-        autoClose: false,
-        closeOnClick: false,
-        closeButton: (
-          <button
-            onClick={() => toast.dismiss()}
-            className="text-white font-bold bg-blue-500 hover:bg-blue-700 rounded px-2 py-1"
-            style={{
-              fontSize: '12px',
-              lineHeight: '1.2',
-              padding: '1px 6px',
-              height: '20px',
-            }}
-          >
-            OK
-          </button>
-        ),
-        draggable: false,
-        className: 'toast-centered',
-        bodyClassName: 'toast-body-centered',
-        style: {
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }
-      });
-      return;
-    }
+    if (!offeredDate) return;
 
     try {
-      const response = await axios.post('/api/soberData', { soberDate: newDate });
+      const formattedDate = offeredDate.toISOString().split('T')[0]; // Format as yyyy-mm-dd
+      const response = await axios.post('/api/soberData', { soberDate: formattedDate });
       if (response.status === 200) {
-        setOfferedDate(newDate);
         toast.success('Sober date updated successfully!');
       }
     } catch (error) {
@@ -154,14 +115,12 @@ const Sobers: React.FC = () => {
     setIsModalOpen(false);
   };
 
-  const formatDate = (dateString: string) => {
-    const [year, month, day] = dateString.split('-');
-    const formattedDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day)).toLocaleDateString('en-US', {
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
     });
-    return formattedDate;
   };
 
   return (
@@ -182,13 +141,12 @@ const Sobers: React.FC = () => {
           <div className="text-xl font-bold text-black mb-4 text-center">Select Sobriety Date</div>
           
           <div className="flex justify-center mb-4">
-            <input
-              type="date"
-              value={newDate}
+            <DatePicker
+              selected={offeredDate}
               onChange={handleDateChange}
-              placeholder="MM/DD/YYYY" // Added placeholder
+              dateFormat="MM/dd/yyyy"
+              placeholderText="MM/DD/YYYY" 
               className="border rounded-md p-2 text-center text-black focus:outline-none focus:ring-2 focus:ring-blue-400 w-3/4 sm:w-1/2 bg-gradient-to-l from-blue-300 via-blue-100 to-blue-200"
-              style={{ fontSize: '18px' }} // Adjusted font size for better visibility
             />
           </div>
           
