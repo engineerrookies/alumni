@@ -145,8 +145,11 @@ const Sobers: React.FC = () => {
               selected={offeredDate}
               onChange={handleDateChange}
               dateFormat="MM/dd/yyyy"
+              showYearDropdown
+              scrollableYearDropdown
               placeholderText="MM/DD/YYYY" 
               className="border rounded-md p-2 text-center text-black focus:outline-none focus:ring-2 focus:ring-blue-400 w-3/4 sm:w-1/2 bg-gradient-to-l from-blue-300 via-blue-100 to-blue-200"
+              portalId="root-portal" // Renders date picker in a portal to avoid conflicts
             />
           </div>
           
