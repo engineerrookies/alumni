@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Modal from './Modal';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Button } from '@/components/ui/button';
 
 const Sobers: React.FC = () => {
-  const [offeredDate, setOfferedDate] = useState<string>('');
+  const [offeredDate, setOfferedDate] = useState<Date | null>(null);
   const [timeDiff, setTimeDiff] = useState<{
     years: number;
     months: number;
@@ -14,17 +15,14 @@ const Sobers: React.FC = () => {
     hours: number;
   } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newDate, setNewDate] = useState<string>('');
   const [notification, setNotification] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSoberDate = async () => {
       try {
         const response = await axios.get('/api/soberData');
-        if (response.status === 200) {
-          setOfferedDate(response.data.soberDate);
-        } else {
-          console.error('Failed to fetch sober date');
+        if (response.status === 200 && response.data.soberDate) {
+          setOfferedDate(new Date(response.data.soberDate));
         }
       } catch (error) {
         console.error('Error fetching sober date:', error);
@@ -40,12 +38,7 @@ const Sobers: React.FC = () => {
     const calculateDateDifference = () => {
       try {
         const currentDate = new Date();
-        const offered = new Date(offeredDate);
-
-        if (isNaN(offered.getTime())) {
-          console.error('Invalid date format:', offeredDate);
-          return;
-        }
+        const offered = offeredDate;
 
         const diffInMilliseconds = currentDate.getTime() - offered.getTime();
         const diffInHours = Math.floor(diffInMilliseconds / (1000 * 60 * 60)) - 7;
@@ -77,7 +70,6 @@ const Sobers: React.FC = () => {
   const checkMilestones = (days: number) => {
     const milestones = [30, 60, 90, 183];
     
-    // Check for regular milestones including 6 months
     if (milestones.includes(days)) {
       if (days === 183) {
         setNotification(`🎉 Congratulations! You've reached 6 months of sobriety! 🎉`);
@@ -147,27 +139,18 @@ const Sobers: React.FC = () => {
         return;
       }
     }
-
-    // Check for further years (each 365 days after 5 years) up to 50 years
-    for (let year = 6; year <= 50; year++) {
-      const exactYearDays = 1828 + (year - 5) * 365;
-      if (days === exactYearDays) {
-        setNotification(`🎉 Congratulations! You've been sober for ${year} years! 🎉`);
-        return;
-      }
-    }
   };
 
-  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedDate = event.target.value;
-    setNewDate(selectedDate);
+  const handleDateChange = (date: Date | null) => {
+    setOfferedDate(date);
   };
 
   const handleSaveDate = async () => {
-    const currentDate = new Date();
-    const selectedDate = new Date(newDate);
+    if (!offeredDate) return;
 
-    if (selectedDate > currentDate) {
+    const currentDate = new Date();
+
+    if (offeredDate > currentDate) {
       toast.error('To properly calculate sobriety date, please enter an earlier date.', {
         position: "top-center",
         autoClose: false,
@@ -199,9 +182,8 @@ const Sobers: React.FC = () => {
     }
 
     try {
-      const response = await axios.post('/api/soberData', { soberDate: newDate });
+      const response = await axios.post('/api/soberData', { soberDate: offeredDate.toISOString() });
       if (response.status === 200) {
-        setOfferedDate(newDate);
         toast.success('Sober date updated successfully!');
       }
     } catch (error) {
@@ -211,14 +193,12 @@ const Sobers: React.FC = () => {
     setIsModalOpen(false);
   };
 
-  const formatDate = (dateString: string) => {
-    const [year, month, day] = dateString.split('-');
-    const formattedDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day)).toLocaleDateString('en-US', {
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
     });
-    return formattedDate;
   };
 
   return (
@@ -226,11 +206,11 @@ const Sobers: React.FC = () => {
       <ToastContainer />
       <div className="flex flex-col items-center mb-2 text-black text-center">
         <span
-          className="text-2xl font-bold text-blue-800 cursor-pointer"
+          className="text-2xl font-bold text-green-600 cursor-pointer"
           onClick={() => setIsModalOpen(true)}
           style={{ fontFamily: 'Lato', letterSpacing: '.5px' }}
         >
-          {offeredDate ? formatDate(offeredDate) : formatDate(newDate)}
+          {offeredDate ? formatDate(offeredDate) : 'Enter Sobriety Date!'}
         </span>
       </div>
 
@@ -239,12 +219,12 @@ const Sobers: React.FC = () => {
           <div className="text-xl font-bold text-black mb-4 text-center">Select Sobriety Date</div>
           
           <div className="flex justify-center mb-4">
-            <input
-              type="date"
-              value={newDate}
+            <DatePicker
+              selected={offeredDate}
               onChange={handleDateChange}
+              dateFormat="MM/dd/yyyy"
+              placeholderText='MM/DD/YYYY'
               className="border rounded-md p-2 text-center text-black focus:outline-none focus:ring-2 focus:ring-blue-400 w-3/4 sm:w-1/2 bg-gradient-to-l from-blue-300 via-blue-100 to-blue-200"
-              style={{ zIndex: 1000 }}
             />
           </div>
           
@@ -259,18 +239,22 @@ const Sobers: React.FC = () => {
         </div>
       </Modal>
 
-      <div className="flex flex-col items-center mb-2 text-black text-center">
-        <span className="text-2xl font-bold">{timeDiff?.years.toFixed(2) || 0}</span> Years
-      </div>
-      <div className="flex flex-col items-center mb-2 text-black text-center">
-        <span className="text-2xl font-bold">{timeDiff?.months.toFixed(2) || 0}</span> Months
-      </div>
-      <div className="flex flex-col items-center mb-2 text-black text-center">
-        <span className="text-2xl font-bold">{timeDiff?.days || 1}</span> Days
-      </div>
-      <div className="flex flex-col items-center text-black text-center">
-        <span className="text-2xl font-bold">{timeDiff?.hours || 0}</span> Hours
-      </div>
+      {offeredDate && (
+        <>
+          <div className="flex flex-col items-center mb-2 text-black text-center">
+            <span className="text-2xl font-bold">{timeDiff?.years.toFixed(2) || 0}</span> Years
+          </div>
+          <div className="flex flex-col items-center mb-2 text-black text-center">
+            <span className="text-2xl font-bold">{timeDiff?.months.toFixed(2) || 0}</span> Months
+          </div>
+          <div className="flex flex-col items-center mb-2 text-black text-center">
+            <span className="text-2xl font-bold">{timeDiff?.days || 1}</span> Days
+          </div>
+          <div className="flex flex-col items-center text-black text-center">
+            <span className="text-2xl font-bold">{timeDiff?.hours || 0}</span> Hours
+          </div>
+        </>
+      )}
 
       {notification && (
         <div className="mt-4 text-lg font-bold text-green-600">{notification}</div>
