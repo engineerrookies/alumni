@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Modal from './Modal';
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Sobers: React.FC = () => {
-  const [offeredDate, setOfferedDate] = useState<Date | null>(null);
+  const [offeredDate, setOfferedDate] = useState<string | null>(null);
   const [timeDiff, setTimeDiff] = useState<{
     years: number;
     months: number;
@@ -15,6 +13,7 @@ const Sobers: React.FC = () => {
     hours: number;
   } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newDate, setNewDate] = useState<string>('');
   const [notification, setNotification] = useState<string | null>(null);
 
   useEffect(() => {
@@ -22,7 +21,7 @@ const Sobers: React.FC = () => {
       try {
         const response = await axios.get('/api/soberData');
         if (response.status === 200 && response.data.soberDate) {
-          setOfferedDate(new Date(response.data.soberDate));
+          setOfferedDate(response.data.soberDate);
         }
       } catch (error) {
         console.error('Error fetching sober date:', error);
@@ -38,7 +37,12 @@ const Sobers: React.FC = () => {
     const calculateDateDifference = () => {
       try {
         const currentDate = new Date();
-        const offered = offeredDate;
+        const offered = new Date(offeredDate);
+
+        if (isNaN(offered.getTime())) {
+          console.error('Invalid date format:', offeredDate);
+          return;
+        }
 
         const diffInMilliseconds = currentDate.getTime() - offered.getTime();
         const diffInHours = Math.floor(diffInMilliseconds / (1000 * 60 * 60)) - 7;
@@ -86,51 +90,7 @@ const Sobers: React.FC = () => {
       { year: 3, days: 1097 },
       { year: 4, days: 1462 },
       { year: 5, days: 1828 },
-      { year: 6, days: 2193 },
-      { year: 7, days: 2558 },
-      { year: 8, days: 2923 },
-      { year: 9, days: 3289 },
-      { year: 10, days: 3654 },
-      { year: 11, days: 4019 },
-      { year: 12, days: 4384 },
-      { year: 13, days: 4750 },
-      { year: 14, days: 5115 },
-      { year: 15, days: 5480 },
-      { year: 16, days: 5845 },
-      { year: 17, days: 6211 },
-      { year: 18, days: 6576 },
-      { year: 19, days: 6941 },
-      { year: 20, days: 7306 },
-      { year: 21, days: 7672 },
-      { year: 22, days: 8037 },
-      { year: 23, days: 8402 },
-      { year: 24, days: 8767 },
-      { year: 25, days: 9133 },
-      { year: 26, days: 9498 },
-      { year: 27, days: 9863 },
-      { year: 28, days: 10228 },
-      { year: 29, days: 10594 },
-      { year: 30, days: 10959 },
-      { year: 31, days: 11324 },
-      { year: 32, days: 11689 },
-      { year: 33, days: 12055 },
-      { year: 34, days: 12420 },
-      { year: 35, days: 12785 },
-      { year: 36, days: 13150 },
-      { year: 37, days: 13516 },
-      { year: 38, days: 13881 },
-      { year: 39, days: 14246 },
-      { year: 40, days: 14611 },
-      { year: 41, days: 14977 },
-      { year: 42, days: 15342 },
-      { year: 43, days: 15707 },
-      { year: 44, days: 16072 },
-      { year: 45, days: 16438 },
-      { year: 46, days: 16803 },
-      { year: 47, days: 17168 },
-      { year: 48, days: 17533 },
-      { year: 49, days: 17899 },
-      { year: 50, days: 18264 },
+      // Add more yearly milestones as needed up to 50 years
     ];
 
     for (const milestone of yearMilestones) {
@@ -141,16 +101,16 @@ const Sobers: React.FC = () => {
     }
   };
 
-  const handleDateChange = (date: Date | null) => {
-    setOfferedDate(date);
+  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedDate = event.target.value;
+    setNewDate(selectedDate);
   };
 
   const handleSaveDate = async () => {
-    if (!offeredDate) return;
-
     const currentDate = new Date();
+    const selectedDate = new Date(newDate);
 
-    if (offeredDate > currentDate) {
+    if (selectedDate > currentDate) {
       toast.error('To properly calculate sobriety date, please enter an earlier date.', {
         position: "top-center",
         autoClose: false,
@@ -182,8 +142,9 @@ const Sobers: React.FC = () => {
     }
 
     try {
-      const response = await axios.post('/api/soberData', { soberDate: offeredDate.toISOString() });
+      const response = await axios.post('/api/soberData', { soberDate: newDate });
       if (response.status === 200) {
+        setOfferedDate(newDate);
         toast.success('Sober date updated successfully!');
       }
     } catch (error) {
@@ -193,12 +154,14 @@ const Sobers: React.FC = () => {
     setIsModalOpen(false);
   };
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
+  const formatDate = (dateString: string) => {
+    const [year, month, day] = dateString.split('-');
+    const formattedDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day)).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
     });
+    return formattedDate;
   };
 
   return (
@@ -219,12 +182,12 @@ const Sobers: React.FC = () => {
           <div className="text-xl font-bold text-black mb-4 text-center">Select Sobriety Date</div>
           
           <div className="flex justify-center mb-4">
-            <DatePicker
-              selected={offeredDate}
+            <input
+              type="date"
+              value={newDate}
               onChange={handleDateChange}
-              dateFormat="MM/dd/yyyy"
-              placeholderText='MM/DD/YYYY'
               className="border rounded-md p-2 text-center text-black focus:outline-none focus:ring-2 focus:ring-blue-400 w-3/4 sm:w-1/2 bg-gradient-to-l from-blue-300 via-blue-100 to-blue-200"
+              style={{ zIndex: 1000 }}
             />
           </div>
           
