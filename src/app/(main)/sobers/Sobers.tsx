@@ -214,7 +214,7 @@ const Sobers: React.FC = () => {
       <ToastContainer />
       <div className="flex flex-col items-center mb-2 text-black text-center">
         <span
-          className="text-2xl font-bold text-blue-800 cursor-pointer"
+          className="text-2xl font-bold text-green-600 cursor-pointer"
           onClick={() => setIsModalOpen(true)}
           style={{ fontFamily: 'Lato', letterSpacing: '.5px' }}
         >
