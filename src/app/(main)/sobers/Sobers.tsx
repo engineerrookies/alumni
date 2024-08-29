@@ -223,29 +223,36 @@ const Sobers: React.FC = () => {
       </div>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <div className="text-xl font-bold text-black mb-4 text-center">Select Sobriety Date</div>
-          
-          <div className="flex justify-center mb-4">
-            <input
-              type="date"
-              value={newDate}
-              onChange={handleDateChange}
-              className="border rounded-md p-2 text-center text-black focus:outline-none focus:ring-2 focus:ring-blue-400 w-3/4 sm:w-1/2 bg-gradient-to-l from-blue-300 via-blue-100 to-blue-200"
-              style={{ zIndex: 1000 }}
-            />
-          </div>
-          
-          <div className="flex justify-center">
-            <button
-              onClick={handleSaveDate}
-              className="px-4 py-2 bg-green-400 hover:bg-green-500 text-black font-semibold rounded-md shadow w-3/4 sm:w-1/2"
-            >
-              Save Date
-            </button>
-          </div>
-        </div>
-      </Modal>
+  <div className="bg-white rounded-lg shadow-lg p-6">
+    <div className="text-xl font-bold text-black mb-4 text-center">
+      Select Sobriety Date
+    </div>
+    
+    <div className="flex justify-center mb-4">
+      <input
+        type="date"
+        value={newDate}
+        onChange={handleDateChange}
+        className="border rounded-md p-2 text-center text-black focus:outline-none focus:ring-2 focus:ring-blue-400 w-full sm:w-1/2 bg-gradient-to-l from-blue-300 via-blue-100 to-blue-200"
+        style={{
+          zIndex: 1000,
+          height: '50px', // Adjust height to prevent it from becoming a circle
+          fontSize: '18px', // Make the text inside the input bigger and more readable
+          textAlign: 'center', // Center the text inside the input
+        }}
+      />
+    </div>
+    
+    <div className="flex justify-center">
+      <button
+        onClick={handleSaveDate}
+        className="px-4 py-2 bg-green-400 hover:bg-green-500 text-black font-semibold rounded-md shadow w-3/4 sm:w-1/2"
+      >
+        Save Date
+      </button>
+    </div>
+  </div>
+</Modal>
 
       {offeredDate && (
         <>
