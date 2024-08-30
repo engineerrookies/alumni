@@ -229,23 +229,26 @@ const Sobers: React.FC = () => {
     </div>
     
     <div className="flex justify-center items-center mb-4">
-      <button
-        onClick={() => document.getElementById('dateInput')?.click()} // Trigger click on the hidden input
-        className="flex items-center justify-center w-full sm:w-1/2 bg-gradient-to-l from-blue-300 via-blue-100 to-blue-200 rounded-md p-2"
-        style={{
-          height: '50px',
-        }}
-      >
-        <FaCalendarAlt size={24} color="#2B6CB0" /> {/* Calendar icon */}
-        <span className="ml-2 text-black">Select a Date</span>
-      </button>
-
       <input
-        id="dateInput"
         type="date"
         value={newDate}
         onChange={handleDateChange}
-        className="hidden" // Hide the input field
+        className="appearance-none border rounded-md p-2 text-center text-black focus:outline-none focus:ring-2 focus:ring-blue-400 w-full sm:w-1/2 bg-gradient-to-l from-blue-300 via-blue-100 to-blue-200"
+        style={{
+          height: '50px',
+          fontSize: '18px',
+          textAlign: 'center',
+          cursor: 'pointer',
+        }}
+      />
+      <FaCalendarAlt
+        size={24}
+        color="#2B6CB0"
+        className="ml-2"
+        onClick={() => {
+          const dateInput = document.querySelector('input[type="date"]') as HTMLInputElement;
+          dateInput?.focus();
+        }}
       />
     </div>
     
