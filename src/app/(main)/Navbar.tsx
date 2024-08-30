@@ -7,7 +7,7 @@ import Image from "next/image";
 export default function Navbar() {
   return (
     <header className="sticky top-0 z-10 bg-card shadow-sm">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-5 px-5 py-3">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3">
         <Link href="/" className="flex items-center text-x1 font-bold text-primary">
           <Image
             src={logoImage}
@@ -18,6 +18,7 @@ export default function Navbar() {
           />
           Alumni!
         </Link>
+        <div className="flex items-center gap-4"></div>
           <SearchField />
         <UserButton className="sm:ms-auto" />
       </div>
