@@ -3,7 +3,7 @@ import axios from 'axios';
 import Modal from './Modal';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Button } from '@/components/ui/button';
+import { FaCalendarAlt } from 'react-icons/fa';
 
 const Sobers: React.FC = () => {
   const [offeredDate, setOfferedDate] = useState<string | null>(null);
@@ -228,18 +228,24 @@ const Sobers: React.FC = () => {
       Select Sobriety Date
     </div>
     
-    <div className="flex justify-center mb-4">
+    <div className="flex justify-center items-center mb-4">
+      <button
+        onClick={() => document.getElementById('dateInput')?.click()} // Trigger click on the hidden input
+        className="flex items-center justify-center w-full sm:w-1/2 bg-gradient-to-l from-blue-300 via-blue-100 to-blue-200 rounded-md p-2"
+        style={{
+          height: '50px',
+        }}
+      >
+        <FaCalendarAlt size={24} color="#2B6CB0" /> {/* Calendar icon */}
+        <span className="ml-2 text-black">Select a Date</span>
+      </button>
+
       <input
+        id="dateInput"
         type="date"
         value={newDate}
         onChange={handleDateChange}
-        className="border rounded-md p-2 text-center text-black focus:outline-none focus:ring-2 focus:ring-blue-400 w-full sm:w-1/2 bg-gradient-to-l from-blue-300 via-blue-100 to-blue-200"
-        style={{
-          zIndex: 1000,
-          height: '50px', // Adjust height to prevent it from becoming a circle
-          fontSize: '18px', // Make the text inside the input bigger and more readable
-          textAlign: 'center', // Center the text inside the input
-        }}
+        className="hidden" // Hide the input field
       />
     </div>
     
