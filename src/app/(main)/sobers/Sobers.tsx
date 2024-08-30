@@ -47,7 +47,7 @@ const Sobers: React.FC = () => {
 
         const diffInMilliseconds = currentDate.getTime() - offered.getTime();
         const diffInHours = Math.floor(diffInMilliseconds / (1000 * 60 * 60)) - 7;
-        const diffInDays = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24));
+        const diffInDays = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24)) + 1;
 
         const daysPerMonth = 30.44;
         const adjustedDayForMonths = diffInDays - (diffInDays % daysPerMonth >= daysPerMonth / 2 ? (diffInDays % daysPerMonth) - daysPerMonth : diffInDays % daysPerMonth);
