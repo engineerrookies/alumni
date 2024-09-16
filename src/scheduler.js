@@ -55,7 +55,7 @@ async function checkSoberMilestones() {
   for (const user of users) {
     console.log("Processing user:", user.username);
     const soberDays = Math.floor(
-      (new Date() - new Date(user.sober)) / (1000 * 60 * 60 * 24) + 1
+      (new Date() - new Date(user.sober)) / (1000 * 60 * 60 * 24)
     );
 
     console.log(`User ${user.username} has been sober for ${soberDays} days`);
