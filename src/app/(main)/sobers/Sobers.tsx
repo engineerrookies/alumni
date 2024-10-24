@@ -4,6 +4,7 @@ import Modal from './Modal';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FaCalendarAlt } from 'react-icons/fa';
+import { DateTime } from 'luxon';
 
 const Sobers: React.FC = () => {
   const [offeredDate, setOfferedDate] = useState<string | null>(null);
@@ -37,33 +38,52 @@ const Sobers: React.FC = () => {
 
     const calculateDateDifference = () => {
       try {
-        const currentDate = new Date();
-        const offered = new Date(offeredDate);
+        // const currentDate = new Date();
+        // const offered = new Date(offeredDate);
 
-        if (isNaN(offered.getTime())) {
-          console.error('Invalid date format:', offeredDate);
-          return;
-        }
+        // if (isNaN(offered.getTime())) {
+        //   console.error('Invalid date format:', offeredDate);
+        //   return;
+        // }
 
-        const diffInMilliseconds = currentDate.getTime() - offered.getTime();
-        const diffInHours = Math.floor(diffInMilliseconds / (1000 * 60 * 60)) - 7;
-        const diffInDays = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24));
+        // const diffInMilliseconds = currentDate.getTime() - offered.getTime();
+        // const diffInHours = Math.floor(diffInMilliseconds / (1000 * 60 * 60)) - 7;
+        // const diffInDays = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24));
 
-        const daysPerMonth = 30.44;
-        const adjustedDayForMonths = diffInDays - (diffInDays % daysPerMonth >= daysPerMonth / 2 ? (diffInDays % daysPerMonth) - daysPerMonth : diffInDays % daysPerMonth);
-        const adjustedDayForYears = diffInDays - 2;
+        // const daysPerMonth = 30.44;
+        // const adjustedDayForMonths = diffInDays - (diffInDays % daysPerMonth >= daysPerMonth / 2 ? (diffInDays % daysPerMonth) - daysPerMonth : diffInDays % daysPerMonth);
+        // const adjustedDayForYears = diffInDays - 2;
 
-        const months = parseFloat((adjustedDayForMonths / daysPerMonth).toFixed(2));
-        const years = parseFloat((adjustedDayForYears / 365.25).toFixed(2));
+        // const months = parseFloat((adjustedDayForMonths / daysPerMonth).toFixed(2));
+		  // const years = parseFloat((adjustedDayForYears / 365.25).toFixed(2));
 
-        setTimeDiff({
-          years,
-          months,
-          days: diffInDays,
-          hours: diffInHours,
-        });
-
-        checkMilestones(diffInDays);
+		  const sobrietyDate = DateTime.fromISO(offeredDate).startOf('day');
+		  const currentDate = DateTime.now();
+	  
+		  if (!sobrietyDate.isValid) {
+			console.error('Invalid date format:', offeredDate);
+			return;
+		  }
+	  
+		  // Calculate the precise duration between the two dates
+		  const duration = currentDate.diff(sobrietyDate, ['years', 'months', 'days', 'hours']);
+	  
+		  // Total days and hours including fractions
+		  const totalDays = currentDate.diff(sobrietyDate, 'days').as('days');
+		  const totalHours = currentDate.diff(sobrietyDate, 'hours').as('hours');
+	  
+		  // Total months and years including fractions
+		  const totalMonths = (duration.years * 12) + duration.months + (duration.days / 30.44);
+		  const totalYears = duration.years + (duration.months / 12) + (duration.days / 365.25);
+	  
+		  setTimeDiff({
+			years: totalYears,
+			months: totalMonths,
+			days: totalDays,
+			hours: totalHours,
+		  });
+	  
+		  checkMilestones(Math.floor(totalDays));
       } catch (error) {
         console.error('Error calculating date difference:', error);
       }
@@ -276,10 +296,10 @@ const Sobers: React.FC = () => {
             <span className="text-2xl font-bold">{timeDiff?.months.toFixed(2) || 0}</span> Months
           </div>
           <div className="flex flex-col items-center mb-2 text-black text-center">
-            <span className="text-2xl font-bold">{timeDiff?.days || 1}</span> Days
+            <span className="text-2xl font-bold">{timeDiff?.days.toFixed(0) || 1}</span> Days
           </div>
           <div className="flex flex-col items-center text-black text-center">
-            <span className="text-2xl font-bold">{timeDiff?.hours || 0}</span> Hours
+            <span className="text-2xl font-bold">{timeDiff?.hours.toFixed(0) || 0}</span> Hours
           </div>
         </>
       )}
